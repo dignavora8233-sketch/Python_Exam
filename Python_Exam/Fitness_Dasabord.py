@@ -1,18 +1,23 @@
+# Fitness Tracker Dashboard Analyzer
+
 print("------------------------------------------------------")
-print("           Fitness DashBord Anlyzer                   ")
+print("          Fitness Tracker Dashboard Analyzer")
 print("------------------------------------------------------")
 
 
-#import data
+# Import Libraries
 
 import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from abc import ABC,abstractmethod
 
-#Abstact class
+from abc import ABC, abstractmethod
+
+
+# Abstract Class
+
 class FitnessBase(ABC):
 
     @abstractmethod
@@ -24,204 +29,302 @@ class FitnessBase(ABC):
         pass
 
 
+# Child Class
+
 class Fitness_Tracker(FitnessBase):
 
     def __init__(self):
         self.df = None
 
-    #Data load
+    # Load Data
 
-    def Load_data(self):
-        self.df = 
-        pd.read.csv("fitness_tracker_200_rows.csv")
-        print("Data load successfully..")
-        print("Total Rows:",len(self.df))
-        print("Total Columns:",len(self.df))
+    def load_data(self):
 
+        file_path = "fitness_tracker_200_rows.csv"
 
-    #Display Data
-    
-    def show_detils(self):
-       
-        print("\nFirst 5 Recods.")
+        try:
+            if not os.path.exists(file_path):
+                print("CSV file not found!")
+                return
+
+            self.df = pd.read_csv(file_path)
+
+            print("\nData loaded successfully!")
+            print("Total Rows:", len(self.df))
+            print("Total Columns:", len(self.df.columns))
+
+        except Exception as e:
+            print("Error loading data:", e)
+
+    # Show Data
+
+    def show_data(self):
+
+        if self.df is None:
+            print("Please load data first.")
+            return
+
+        print("\nFirst 5 Records:")
         print(self.df.head())
 
-        print("\nDtatset infotmation")
-       
-        print(self.df.info())
+        print("\nDataset Information:")
+        self.df.info()
 
-        print("\nMissing Value")
-       
+        print("\nMissing Values:")
         print(self.df.isnull().sum())
 
+    # Statistics
 
-    #Statiscis Data
-    def Statiscis(self):
-       
-        print("\nAverage Steps:",self.df["Setps"].mean())
-       
-        print("\nMinimum Steps:",self.df["Setps"].min())
-       
-        print("\nMaximum Steps:",self.df["Setps"].max())
+    def statistics(self):
 
-        print("\nAverage Calories Burned:",self.df["Calories_Burnes"].mean())
-       
-        print("\nAverage Sleep Hours:",self.df["Sleep_Hours"].mean())  
-       
-        print("\nAverage Heart Rate:",self.df["Heart_Rate_Avg"].mean())
+        if self.df is None:
+            print("Please load data first.")
+            return
 
+        required_columns = [
+            "Steps",
+            "Calories",
+            "Sleep_Hours",
+            "Heart_Rate_Avg"
+        ]
 
-    #Goal Anlyzer
-    def Goal_Anlysis(self):
-        
-        print("\nGoal Achievement.")
-        
-        print(self.df["Goal_Achieved"].value_count())
-    
+        for col in required_columns:
+            if col not in self.df.columns:
+                print("Missing required column:", col)
+                return
 
-    #Workout Anlayzer
-    def Workout_Anlysis(self):
-        
-        print("\nWorkour Types.")
-        
-        print(self.df["Workout_Type"].value_count())
+        print("\n===== Fitness Statistics =====")
 
+        print("\nAverage Steps:",
+              self.df["Steps"].mean())
 
+        print("Minimum Steps:",
+              self.df["Steps"].min())
 
-    #Visulaization
-    def Visulization(self):
+        print("Maximum Steps:",
+              self.df["Steps"].max())
 
-        while True():
-            #Chrats
-            print("\n=====Chrats menu=====")
-            print("1.Bar Plot")
-            print("2.Line Plot")
-            print("3.Pie plot")
-            print("4.Heatmep")
-            print("5.Exit to main menu")
+        print("\nAverage Calories Burned:",
+              self.df["Calories"].mean())
 
-            choice = int(input("Enter your choice:"))
+        print("Average Sleep Hours:",
+              self.df["Sleep_Hours"].mean())
 
-            #Bar Chrat
-            if choice == 1:
+        print("Average Heart Rate:",
+              self.df["Heart_Rate_Avg"].mean())
 
-                    plt.figure(figsize=(8,5))
-                    plt.bar(self.df["Steps"])
-                    plt.title("Daily Steps Distribution")
-                    plt.xlabel("Steps")
-                    plt.ylabel("Frequency")
-                    plt.show()
+    # Goal Analysis
 
-            #Line Chrat
-            elif choice == 2:
+    def goal_analysis(self):
+
+        if self.df is None:
+            print("Please load data first.")
+            return
+
+        if "Goal_Achieved" not in self.df.columns:
+            print("Goal_Achieved column not found.")
+            return
+
+        print("\n===== Goal Achievement Analysis =====")
+
+        print(self.df["Goal_Achieved"].value_counts())
+
+    # Workout Analysis
+
+    def workout_analysis(self):
+
+        if self.df is None:
+            print("Please load data first.")
+            return
+
+        if "Workout_Type" not in self.df.columns:
+            print("Workout_Type column not found.")
+            return
+
+        print("\n===== Workout Type Analysis =====")
+
+        print(self.df["Workout_Type"].value_counts())
+
+    # Visualization
+
+    def visualization(self):
+
+        if self.df is None:
+            print("Please load data first.")
+            return
+
+        while True:
+
+            print("\n===== Visualization Menu =====")
+            print("1. Bar Plot")
+            print("2. Line Plot")
+            print("3. Pie Chart")
+            print("4. Heatmap")
+            print("5. Back to Main Menu")
+
+            choice = input("Enter your choice: ")
+
+            # Bar Plot
+
+            if choice == "1":
+
+                if "Steps" not in self.df.columns:
+                    print("Steps column not found.")
+                    continue
+
+                plt.figure(figsize=(8, 5))
+
+                plt.bar(
+                    self.df.index + 1,
+                    self.df["Steps"]
+                )
+
+                plt.title("Daily Steps Distribution")
+                plt.xlabel("Record Number")
+                plt.ylabel("Steps")
+                plt.tight_layout()
+                plt.show()
+
+            # Line Plot
+
+            elif choice == "2":
+
+                if "Calories" not in self.df.columns:
+                    print("Calories column not found.")
+                    continue
+
                 plt.figure(figsize=(10, 5))
-                plt.plot(self.df["Calories"])
-                plt.title("Daily calories Discribe")
-                plt.xlabel("Date")
-                plt.ylabel("Average Step")
+
+                plt.plot(
+                    self.df.index + 1,
+                    self.df["Calories"],
+                    marker="o"
+                )
+
+                plt.title("Calories Burned Analysis")
+                plt.xlabel("Record Number")
+                plt.ylabel("Calories Burned")
+                plt.tight_layout()
                 plt.show()
 
-            #Pie Chrat
-            elif choice == 3:
-                plt.figure(figsize= (10, 10))
-                plt.pie(self.df["Workout_Type"])
-                plt.title("Percenatge Distribution Activity")
-                plt.ylabel("")
+            # Pie Chart
+
+            elif choice == "3":
+
+                if "Workout_Type" not in self.df.columns:
+                    print("Workout_Type column not found.")
+                    continue
+
+                workout_counts = self.df[
+                    "Workout_Type"
+                ].value_counts()
+
+                if workout_counts.empty:
+                    print("No workout data available.")
+                    continue
+
+                plt.figure(figsize=(8, 8))
+
+                plt.pie(
+                    workout_counts,
+                    labels=workout_counts.index,
+                    autopct="%1.1f%%",
+                    startangle=90
+                )
+
+                plt.title("Workout Type Distribution")
+                plt.tight_layout()
                 plt.show()
 
-            elif choice == 4:
-                plt.figure(figsize=(10,5))
-                sns.heatmap(numiac.data.corr(),
-                            annot=True,
-                            cmap="coolwarm"
-                            )
-                plt.title("Fitness Data Corration Heatmap")
+            # Heatmap
+
+            elif choice == "4":
+
+                numeric_data = self.df.select_dtypes(
+                    include=np.number
+                )
+
+                if numeric_data.shape[1] < 2:
+                    print("At least 2 numerical columns are required.")
+                    continue
+
+                plt.figure(figsize=(10, 6))
+
+                sns.heatmap(
+                    numeric_data.corr(),
+                    annot=True,
+                    cmap="coolwarm",
+                    fmt=".2f"
+                )
+
+                plt.title("Fitness Data Correlation Heatmap")
+                plt.tight_layout()
                 plt.show()
 
-            elif choice == 5:
+            # Back to Main Menu
 
-                print("Go to main menu..")
+            elif choice == "5":
 
+                print("Returning to Main Menu...")
+                break
 
             else:
 
-                print("Invalid choice.")
+                print("Invalid choice! Please try again.")
 
 
+# Create Object
 
 obj = Fitness_Tracker()
 
-print("--------------------------------------------------------")
-print("                Main Menu                               ")                   
-print("--------------------------------------------------------")
 
-while True():
+# Main Menu
 
-    print("====Main Menu====")
-    print("1.Load Data")
-    print("2.Show Data")
-    print("3.Statiscis")
-    print("4.Goal Anlysis")
-    print("5.Workout Anlysis")
-    print("6.Visulization")
-    print("7.Exit")
+while True:
 
-    choice = int(input("Enter Your Choice:"))
+    print("\n------------------------------------------------------")
+    print("                    Main Menu")
+    print("------------------------------------------------------")
 
-    if choice == 1:
-        
-        obj.Load_data()
+    print("1. Load Data")
+    print("2. Show Data")
+    print("3. Statistics")
+    print("4. Goal Analysis")
+    print("5. Workout Analysis")
+    print("6. Visualization")
+    print("7. Exit")
 
-    elif choice == 2:
+    choice = input("Enter your choice: ")
 
-        obj.show_detils()
+    if choice == "1":
 
-    elif choice == 3:
+        obj.load_data()
 
-        obj.Statiscis()
+    elif choice == "2":
 
-    elif choice == 4:
+        obj.show_data()
 
-        obj.Goal_Anlysis()
+    elif choice == "3":
 
+        obj.statistics()
 
-    elif choice == 5:
+    elif choice == "4":
 
-        obj.Workout_Anlysis()
+        obj.goal_analysis()
 
-    elif choice == 6:
+    elif choice == "5":
 
-        obj.Visulization()
+        obj.workout_analysis()
 
-    elif choice == 7:
+    elif choice == "6":
 
-        print("Thank You.....")
+        obj.visualization()
+
+    elif choice == "7":
+
+        print("Thank You for using Fitness Tracker Analyzer!")
+        break
 
     else:
 
-        print("Inavaild choice.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        print("Invalid choice! Please enter 1 to 7.")
